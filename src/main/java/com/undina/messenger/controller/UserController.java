@@ -85,13 +85,6 @@ public class UserController {
     @PostMapping("/logout")
     public ResponseEntity<?> logoutUser(HttpServletRequest request, HttpSession session, HttpServletResponse response) {
         log.info("logout");
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        Object principal = auth.getPrincipal();
-        if (principal instanceof SecurityUser) {
-            User user = ((SecurityUser) principal).getUser();
-            // userService.logout(user);
-        }
 
         session.invalidate();
         Cookie[] cookies = request.getCookies();
@@ -103,7 +96,7 @@ public class UserController {
                 response.addCookie(cookie);
             }
         }
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 
