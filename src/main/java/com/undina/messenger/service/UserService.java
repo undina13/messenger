@@ -8,7 +8,7 @@ import com.undina.messenger.model.User;
 import com.undina.messenger.model.dto.LoginRequest;
 import com.undina.messenger.model.dto.RegisterUser;
 
-import com.undina.messenger.model.dto.UpdateRequest;
+import com.undina.messenger.model.dto.UpdateUser;
 import com.undina.messenger.model.dto.UserTo;
 import com.undina.messenger.repository.UserRepository;
 import com.undina.messenger.security.JWTToken;
@@ -87,26 +87,26 @@ public class UserService {
         return new JWTToken(user.getId(), user.getRole(), token);
     }
 
-    public JWTToken changeUserInfo(String userId, UpdateRequest updateRequest) {
+    public JWTToken changeUserInfo(String userId, UpdateUser updateUser) {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new ApplicationException(HttpStatus.NOT_FOUND, "Not found"));
-        if(updateRequest.getEmail()!=null){
+        if(updateUser.getEmail()!=null){
             user.setVerifyCode(generateVerifyCode());
-            String activationLink = host + "/users/email/" + updateRequest.getEmail() + "/" + user.getId() + "/" + user.getVerifyCode();
+            String activationLink = host + "/users/email/" + updateUser.getEmail() + "/" + user.getId() + "/" + user.getVerifyCode();
             userRepository.save(user);
             emailSender.sendMessage(
                     "Change your email",
                     activationLink,
-                    updateRequest.getEmail());
+                    updateUser.getEmail());
         }
-        if(updateRequest.getLogin()!=null){
-            user.setLogin(updateRequest.getLogin());
+        if(updateUser.getLogin()!=null){
+            user.setLogin(updateUser.getLogin());
         }
-        if(updateRequest.getFirstName()!=null){
-            user.setFirstName(updateRequest.getFirstName());
+        if(updateUser.getFirstName()!=null){
+            user.setFirstName(updateUser.getFirstName());
         }
-        if(updateRequest.getLastName()!=null){
-            user.setLastName(updateRequest.getLastName());
+        if(updateUser.getLastName()!=null){
+            user.setLastName(updateUser.getLastName());
         }
         userRepository.save(user);
         String token = jwtUtil.generateToken(user.getId(), user.getRole());

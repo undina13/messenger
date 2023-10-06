@@ -8,7 +8,7 @@ import lombok.ToString;
 @Setter
 @Getter
 @ToString
-public class UpdateRequest {
+public class UpdateUser {
     private String email;
     private String login;
     private String firstName;

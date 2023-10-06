@@ -168,7 +168,7 @@ public class UserController {
 
     @PatchMapping("/me")
     public ResponseEntity<?> changeCurrentUserInfo(
-            HttpServletRequest request, @Valid @RequestBody UpdateRequest updateRequest, Errors errors) {
+            HttpServletRequest request, @Valid @RequestBody UpdateUser updateUser, Errors errors) {
         log.info("Change current user info");
         if (errors.hasErrors()) {
             log.info("Validation error with request: " + request.getRequestURI());
@@ -180,7 +180,7 @@ public class UserController {
             if (principal instanceof SecurityUser) {
                 User user = ((SecurityUser) principal).getUser();
 
-                return ResponseEntity.ok(userService.changeUserInfo(user.getId(), updateRequest));
+                return ResponseEntity.ok(userService.changeUserInfo(user.getId(), updateUser));
             }
         }
         throw new ApplicationException(HttpStatus.UNAUTHORIZED, "Wrong credentials");
