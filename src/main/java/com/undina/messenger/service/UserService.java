@@ -103,10 +103,10 @@ public class UserService {
             user.setLogin(updateRequest.getLogin());
         }
         if(updateRequest.getFirstName()!=null){
-            user.setLogin(updateRequest.getFirstName());
+            user.setFirstName(updateRequest.getFirstName());
         }
         if(updateRequest.getLastName()!=null){
-            user.setLogin(updateRequest.getLastName());
+            user.setLastName(updateRequest.getLastName());
         }
         userRepository.save(user);
         String token = jwtUtil.generateToken(user.getId(), user.getRole());
@@ -151,14 +151,13 @@ public class UserService {
         return new JWTToken(user.getId(), user.getRole(), token);
     }
 
-    public JWTToken changeUserStatus(String userId, Boolean isBlocked) {
+    public void changeUserStatus(String userId, Boolean isBlocked) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new ApplicationException(HttpStatus.NOT_FOUND, "User not found")
         );
         user.setBlocked(isBlocked);
         userRepository.save(user);
-        String token = jwtUtil.generateToken(user.getId(), user.getRole());
-        return new JWTToken(user.getId(), user.getRole(), token);
+
     }
 
     public void deleteUser(String userId) {

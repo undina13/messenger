@@ -197,7 +197,7 @@ public class UserController {
     @GetMapping("/email/{newEmail}/{userId}/{verifyCode}")
     public ResponseEntity<?> changeUserEmail(
             @Parameter(description = "New email")
-            @PathVariable @Size(max = 12) String newEmail,
+            @PathVariable  String newEmail,
             @Parameter(description = "UUID of a User")
             @PathVariable UUID userId,
             @Parameter(description = "Verification code")
@@ -239,11 +239,11 @@ public class UserController {
         throw new ApplicationException(HttpStatus.UNAUTHORIZED, "Wrong credentials");
     }
 
-    @Operation(summary = "Change current user password")
+    @Operation(summary = "Change current user status")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Changed current user password",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = JWTToken.class))}),
+            @ApiResponse(responseCode = "200", description = "Changed current user status",
+                    content = @Content
+                    ),
             @ApiResponse(responseCode = "400", description = "Invalid password supplied",
                     content = @Content),
             @ApiResponse(responseCode = "401", description = "Wrong credentials",
@@ -251,19 +251,16 @@ public class UserController {
     })
     @PatchMapping("/blocked/{isBlocked}")
     public ResponseEntity<?> changeCurrentUserStatus(
-            HttpServletRequest request, @PathVariable Boolean isBlocked, Errors errors) {
+            @PathVariable("isBlocked") boolean isBlocked) {
         log.info("Change current user status");
-        if (errors.hasErrors()) {
-            log.info("Validation error with request: " + request.getRequestURI());
-            return ResponseEntity.badRequest().body(ValidationErrorBuilder.fromBindingErrors(errors));
-        }
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {
             Object principal = auth.getPrincipal();
             if (principal instanceof SecurityUser) {
                 User user = ((SecurityUser) principal).getUser();
-
-                return ResponseEntity.ok(userService.changeUserStatus(user.getId(), isBlocked));
+                userService.changeUserStatus(user.getId(), isBlocked);
+                return ResponseEntity.ok().build();
             }
         }
         throw new ApplicationException(HttpStatus.UNAUTHORIZED, "Wrong credentials");
