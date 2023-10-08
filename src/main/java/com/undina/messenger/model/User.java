@@ -9,6 +9,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -44,6 +47,15 @@ public class User {
     @Column(name = "created", nullable = false)
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime created = LocalDateTime.now();
+    @ManyToMany(targetEntity = User.class, fetch = FetchType.LAZY)
+    @JsonIgnore
+    @JoinTable(name = "user_friends", joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "friend_user_id"))
+    private Set<User> friends = new HashSet<>();
+    @Column(name = "is_closed_messages")
+    private boolean isClosedMessages;
+    @Column(name = "is_closed_friends")
+    private boolean isClosedFriends;
 
     public User(String id, String email, String password, String role, Boolean blocked) {
         this.id = id;
@@ -57,8 +69,8 @@ public class User {
         this(null, email, password, role, true);
     }
 
-    public User(String uuid, String email, String password, String role) {
-        this(uuid, email, password, role, true);
-    }
+  //  public User(String id, String email, String password, String role) {
+   //     this(id, email, password, role, true);
+  //  }
 
 }

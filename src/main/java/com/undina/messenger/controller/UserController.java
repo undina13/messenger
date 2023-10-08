@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -288,6 +289,61 @@ public class UserController {
         }
         throw new ApplicationException(HttpStatus.UNAUTHORIZED, "Wrong credentials");
     }
+    @Operation(summary = "Add user in friends")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Add user in friends",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UserTo.class))}),
+            @ApiResponse(responseCode = "400", description = "User friends is closed",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "Wrong credentials",
+                    content = @Content)
+    })
+    @PostMapping("/friend/{friendLogin}")
+    public ResponseEntity<?> addToFriends(
+            @PathVariable String friendLogin) {
+        log.info("Change current user info");
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            Object principal = auth.getPrincipal();
+            if (principal instanceof SecurityUser) {
+                User user = ((SecurityUser) principal).getUser();
+
+                return ResponseEntity.ok(userService.addUserToFriends(user.getId(), friendLogin));
+            }
+        }
+        throw new ApplicationException(HttpStatus.UNAUTHORIZED, "Wrong credentials");
+    }
+
+    @Operation(summary = "Get user friends")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Get user friends",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UserTo.class))}),
+            @ApiResponse(responseCode = "400", description = "User friends is closed",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "Wrong credentials",
+                    content = @Content)
+    })
+    @GetMapping("/friend/{friendLogin}")
+    public ResponseEntity<Set<UserTo>> getFriends(
+            @PathVariable String friendLogin) {
+        log.info("Change current user info");
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            Object principal = auth.getPrincipal();
+            if (principal instanceof SecurityUser) {
+                User user = ((SecurityUser) principal).getUser();
+
+                return ResponseEntity.ok(userService.getUserFriends(user.getId(), friendLogin));
+            }
+        }
+        throw new ApplicationException(HttpStatus.UNAUTHORIZED, "Wrong credentials");
+    }
+
+
 }
 
 

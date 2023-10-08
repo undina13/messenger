@@ -1,13 +1,11 @@
 package com.undina.messenger.service;
 
 
-
 import com.undina.messenger.emailsender.EmailSender;
 import com.undina.messenger.mapper.UserMapper;
 import com.undina.messenger.model.User;
 import com.undina.messenger.model.dto.LoginRequest;
 import com.undina.messenger.model.dto.RegisterUser;
-
 import com.undina.messenger.model.dto.UpdateUser;
 import com.undina.messenger.model.dto.UserTo;
 import com.undina.messenger.repository.UserRepository;
@@ -20,8 +18,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,12 +48,11 @@ public class UserService {
         return new JWTToken(user.getId(), user.getRole(), token);
     }
 
-      public JWTToken signup(RegisterUser registerUser) {
+    public JWTToken signup(RegisterUser registerUser) {
         User user = userMapper.toUser(registerUser);
         if (user.getEmail().endsWith(adminEmailDomain)) {
             user.setRole("ROLE_ADMIN");
-        }
-        else {
+        } else {
             user.setRole("ROLE_USER");
         }
         user.setVerifyCode(generateVerifyCode());
@@ -61,10 +61,10 @@ public class UserService {
         String token = jwtUtil.generateToken(registratedUser.getId(), registratedUser.getRole());
         String activationLink = host + "/users/activate/" + registratedUser.getId() + "/" + registratedUser.getVerifyCode();
 
-            emailSender.sendMessage(
-                    "Activate your email",
-                    activationLink,
-                    registratedUser.getEmail());
+        emailSender.sendMessage(
+                "Activate your email",
+                activationLink,
+                registratedUser.getEmail());
 
         return new JWTToken(registratedUser.getId(), registratedUser.getRole(), token);
     }
@@ -90,7 +90,7 @@ public class UserService {
     public JWTToken changeUserInfo(String userId, UpdateUser updateUser) {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new ApplicationException(HttpStatus.NOT_FOUND, "Not found"));
-        if(updateUser.getEmail()!=null){
+        if (updateUser.getEmail() != null) {
             user.setVerifyCode(generateVerifyCode());
             String activationLink = host + "/users/email/" + updateUser.getEmail() + "/" + user.getId() + "/" + user.getVerifyCode();
             userRepository.save(user);
@@ -99,13 +99,13 @@ public class UserService {
                     activationLink,
                     updateUser.getEmail());
         }
-        if(updateUser.getLogin()!=null){
+        if (updateUser.getLogin() != null) {
             user.setLogin(updateUser.getLogin());
         }
-        if(updateUser.getFirstName()!=null){
+        if (updateUser.getFirstName() != null) {
             user.setFirstName(updateUser.getFirstName());
         }
-        if(updateUser.getLastName()!=null){
+        if (updateUser.getLastName() != null) {
             user.setLastName(updateUser.getLastName());
         }
         userRepository.save(user);
@@ -165,5 +165,29 @@ public class UserService {
                 () -> new ApplicationException(HttpStatus.NOT_FOUND, "User not found")
         );
         userRepository.delete(user);
+    }
+
+    @Transactional
+    public UserTo addUserToFriends(String userId, String friendLogin) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new ApplicationException(HttpStatus.NOT_FOUND, "User not found")
+        );
+        User friend = userRepository.findByLogin(friendLogin).orElseThrow(() ->
+                new ApplicationException(HttpStatus.NOT_FOUND, "Not found"));
+        user.getFriends().add(friend);
+        userRepository.save(friend);
+        return userMapper.toUserTo(friend);
+    }
+
+   @Transactional(readOnly = true)
+    public Set<UserTo> getUserFriends(String userId, String friendLogin) {
+        User friend = userRepository.findByLogin(friendLogin).orElseThrow(() ->
+                new ApplicationException(HttpStatus.NOT_FOUND, "Not found"));
+        if (friend.isClosedFriends()) {
+
+                throw new ApplicationException(HttpStatus.CONFLICT, "user have closed list of friends");
+            }
+
+        return friend.getFriends().stream().map(user -> userMapper.toUserTo(user)).collect(Collectors.toSet());
     }
 }
