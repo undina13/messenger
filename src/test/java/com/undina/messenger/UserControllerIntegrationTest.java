@@ -176,6 +176,5 @@ public class UserControllerIntegrationTest {
     void testGetFriendsClosedFriends() throws Exception {
         perform(get("/users/friend/Sidor"))
                 .andExpect(status().isConflict());
-
     }
 }

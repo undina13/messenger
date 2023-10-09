@@ -69,8 +69,4 @@ public class User {
         this(null, email, password, role, true);
     }
 
-  //  public User(String id, String email, String password, String role) {
-   //     this(id, email, password, role, true);
-  //  }
-
 }

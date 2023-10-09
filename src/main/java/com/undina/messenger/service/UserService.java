@@ -109,6 +109,12 @@ public class UserService {
         if (updateUser.getLastName() != null) {
             user.setLastName(updateUser.getLastName());
         }
+        if(updateUser.getIsClosedFriends()!=null){
+            user.setClosedFriends(updateUser.getIsClosedFriends());
+        }
+        if(updateUser.getIsClosedMessages()!=null){
+            user.setClosedMessages(updateUser.getIsClosedMessages());
+        }
         userRepository.save(user);
         String token = jwtUtil.generateToken(user.getId(), user.getRole());
         return new JWTToken(user.getId(), user.getRole(), token);
