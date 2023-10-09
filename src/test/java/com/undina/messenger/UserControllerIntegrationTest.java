@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -29,13 +30,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Sql("/user_data.sql")
 public class UserControllerIntegrationTest {
     public static final User USER_1 = new User("b4861725-8aa5-4770-8e78-c9b6694dc975", "user1@mail.ru",
-            "$2a$10$lTgowhKpte2llERILz/C9ermIl9Q.ICoDa0ZkkLSm9dR2OeNdtKuW", "ROLE_USER");
+            "$2a$10$lTgowhKpte2llERILz/C9ermIl9Q.ICoDa0ZkkLSm9dR2OeNdtKuW", "ROLE_USER", false);
 
     public static final UserTo USER_1_To = new UserTo("user1@mail.ru", "Ivan",
             "Ivan", "Ivanov");
     public static final UserTo USER_2_To = new UserTo("user1@mail.ru", "superLogin",
             "Ivan", "Ivanov");
-
+    public static final UserTo USER_3_To = new UserTo("user2@mail.ru", "Petr",
+            "Petr", "Petrov");
 
     @Autowired
     protected MockMvc mockMvc;
@@ -158,5 +160,22 @@ public class UserControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().json(mapper.writeValueAsString(USER_2_To)));
+    }
+
+    @Test
+    @WithUserDetails(value = "user2@mail.ru")
+    void testGetFriends() throws Exception {
+        perform(get("/users/friend/Ivan"))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(content().json(mapper.writeValueAsString(List.of(USER_3_To))));
+    }
+
+    @Test
+    @WithUserDetails(value = "user2@mail.ru")
+    void testGetFriendsClosedFriends() throws Exception {
+        perform(get("/users/friend/Sidor"))
+                .andExpect(status().isConflict());
+
     }
 }

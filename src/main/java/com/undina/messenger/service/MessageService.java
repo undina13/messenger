@@ -11,6 +11,7 @@ import com.undina.messenger.validation.exceptions.ApplicationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ public class MessageService {
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
     private final MessageMapper messageMapper;
+    @Transactional(readOnly = true)
     public FullMessageDto createMessage(CreateMessageDto createMessageDto, String userId) {
         Message message = messageMapper.toMessage(createMessageDto);
         User author = userRepository.findById(userId).orElseThrow(() ->
@@ -32,6 +34,9 @@ public class MessageService {
         User recipient = userRepository.findByLogin(createMessageDto.getLogin()).orElseThrow(() ->
                 new ApplicationException(HttpStatus.NOT_FOUND, "Not found"));
         message.setRecipient(recipient);
+        if(recipient.isClosedMessages()&&!recipient.getFriends().contains(author)){
+            throw new ApplicationException(HttpStatus.BAD_REQUEST, "Only friends can write this user");
+        }
         return messageMapper.toFullMessageDto(messageRepository.save(message));
     }
 

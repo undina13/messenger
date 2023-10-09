@@ -69,6 +69,7 @@ public class UserService {
         return new JWTToken(registratedUser.getId(), registratedUser.getRole(), token);
     }
 
+
     public UserTo getUserInfo(String userId) {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new ApplicationException(HttpStatus.NOT_FOUND, "Not found"));

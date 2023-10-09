@@ -34,22 +34,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc()
 @Sql("/message_data.sql")
 public class MessageControllerIntegrationTest {
-    public static final User USER_1 = new User("b4861725-8aa5-4770-8e78-c9b6694dc975", "user1@mail.ru",
-            "$2a$10$lTgowhKpte2llERILz/C9ermIl9Q.ICoDa0ZkkLSm9dR2OeNdtKuW", "ROLE_USER");
-    public static final User USER_2 = new User("f09108bf-b0ff-4017-85e9-8799b702f246", "user2@mail.ru",
-            "$2a$10$lTgowhKpte2llERILz/C9ermIl9Q.ICoDa0ZkkLSm9dR2OeNdtKuW", "ROLE_USER");
-
-    public static final UserTo USER_1_To = new UserTo("user1@mail.ru", "Ivan",
-            "Ivan", "Ivanov");
-    public static final UserTo USER_2_To = new UserTo("user2@mail.ru", "Petr",
-            "Petr", "Petrov");
+//    public static final User USER_1 = new User("b4861725-8aa5-4770-8e78-c9b6694dc975", "user1@mail.ru",
+//            "$2a$10$lTgowhKpte2llERILz/C9ermIl9Q.ICoDa0ZkkLSm9dR2OeNdtKuW", "ROLE_USER");
+//    public static final User USER_2 = new User("f09108bf-b0ff-4017-85e9-8799b702f246", "user2@mail.ru",
+//            "$2a$10$lTgowhKpte2llERILz/C9ermIl9Q.ICoDa0ZkkLSm9dR2OeNdtKuW", "ROLE_USER");
+//
+//    public static final UserTo USER_1_To = new UserTo("user1@mail.ru", "Ivan",
+//            "Ivan", "Ivanov");
+//    public static final UserTo USER_2_To = new UserTo("user2@mail.ru", "Petr",
+//            "Petr", "Petrov");
 
 
 
     public static final CreateMessageDto CREATE_MESSAGE_DTO = new CreateMessageDto(
           "Petr", "some text");
+
+    public static final CreateMessageDto CREATE_MESSAGE_DTO1 = new CreateMessageDto(
+            "Sidor", "some text");
     public static final CreateMessageDto CREATE_WRONG_MESSAGE_DTO = new CreateMessageDto(
             "Petrrr", "some text");
+
     public static final FullMessageDto FULL_MESSAGE_DTO_2 = new FullMessageDto(
             "b4861725-8aa5-4770-8e78-c9b6694dc991", "Petr", "Ivan", "text1answer2", LocalDateTime
             .of(2023, 10, 2, 19, 14, 10));
@@ -83,6 +87,30 @@ public class MessageControllerIntegrationTest {
     }
 
     @Test
+    @DirtiesContext
+    @WithUserDetails(value = "user1@mail.ru")
+    void testCreateMessageClosedFriends() throws Exception {
+        perform(MockMvcRequestBuilders.post("/messages")
+                .content(mapper.writeValueAsString(CREATE_MESSAGE_DTO1))
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DirtiesContext
+    @WithUserDetails(value = "user2@mail.ru")
+    void testCreateMessageClosedFriendsByFriend() throws Exception {
+        perform(MockMvcRequestBuilders.post("/messages")
+                .content(mapper.writeValueAsString(CREATE_MESSAGE_DTO1))
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(print())
+                .andExpect(jsonPath("$.text").value(CREATE_MESSAGE_DTO1.getText()));
+    }
+
+    @Test
     @WithUserDetails(value = "user2@mail.ru")
     void testCreateMessageWrongUser() throws Exception {
         perform(MockMvcRequestBuilders.post("/messages")
@@ -94,7 +122,7 @@ public class MessageControllerIntegrationTest {
 
     @Test
     @WithUserDetails(value = "user1@mail.ru")
-    void testCreateWrongContractMessage() throws Exception {
+    void testCreateWrongMessage() throws Exception {
         perform(MockMvcRequestBuilders.post("/messages")
                 .content(mapper.writeValueAsString(CREATE_WRONG_MESSAGE_DTO))
                 .characterEncoding(StandardCharsets.UTF_8)
@@ -137,5 +165,6 @@ public class MessageControllerIntegrationTest {
                 .andDo(print())
                 .andExpect(content().json(mapper.writeValueAsString(new ArrayList<>())));
     }
+
 
 }
