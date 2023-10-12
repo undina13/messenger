@@ -1,20 +1,13 @@
 package com.undina.messenger.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.undina.messenger.AbstractTest;
 import com.undina.messenger.model.User;
 import com.undina.messenger.model.dto.*;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -24,11 +17,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@Transactional
-@AutoConfigureMockMvc()
 @Sql("/user_data.sql")
-public class UserControllerIntegrationTest {
+public class UserControllerIntegrationTest extends AbstractTest {
     public static final User USER_1 = new User("b4861725-8aa5-4770-8e78-c9b6694dc975", "user1@mail.ru",
             "$2a$10$lTgowhKpte2llERILz/C9ermIl9Q.ICoDa0ZkkLSm9dR2OeNdtKuW", "ROLE_USER", false);
 
@@ -39,15 +29,6 @@ public class UserControllerIntegrationTest {
     public static final UserTo USER_3_To = new UserTo("user2@mail.ru", "Petr",
             "Petr", "Petrov");
 
-    @Autowired
-    protected MockMvc mockMvc;
-    @Autowired
-    ObjectMapper mapper;
-
-
-    protected ResultActions perform(MockHttpServletRequestBuilder builder) throws Exception {
-        return mockMvc.perform(builder);
-    }
 
     @Test
     @WithUserDetails(value = "user1@mail.ru")
@@ -130,7 +111,7 @@ public class UserControllerIntegrationTest {
     @Test
     void getUnAuth() throws Exception {
         perform(get("/users/me"))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

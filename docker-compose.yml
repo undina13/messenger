@@ -14,8 +14,16 @@ services:
 
 
   messenger:
-    build: ./messenger
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: messenger
     restart: always
     ports:
       - "8080:8080"
+    depends_on:
+      - postgres1
+    environment:
+      DATABASE_URL: "jdbc:postgresql://postgres1:5432/postgres"
+      POSTGRES_USER: "user"
+      POSTGRES_PASSWORD: "password"

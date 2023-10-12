@@ -1,50 +1,25 @@
 package com.undina.messenger.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import com.undina.messenger.model.User;
+import com.undina.messenger.AbstractTest;
 import com.undina.messenger.model.dto.CreateMessageDto;
 import com.undina.messenger.model.dto.FullMessageDto;
-import com.undina.messenger.model.dto.UserTo;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@Transactional
-@AutoConfigureMockMvc()
 @Sql("/message_data.sql")
-public class MessageControllerIntegrationTest {
-//    public static final User USER_1 = new User("b4861725-8aa5-4770-8e78-c9b6694dc975", "user1@mail.ru",
-//            "$2a$10$lTgowhKpte2llERILz/C9ermIl9Q.ICoDa0ZkkLSm9dR2OeNdtKuW", "ROLE_USER");
-//    public static final User USER_2 = new User("f09108bf-b0ff-4017-85e9-8799b702f246", "user2@mail.ru",
-//            "$2a$10$lTgowhKpte2llERILz/C9ermIl9Q.ICoDa0ZkkLSm9dR2OeNdtKuW", "ROLE_USER");
-//
-//    public static final UserTo USER_1_To = new UserTo("user1@mail.ru", "Ivan",
-//            "Ivan", "Ivanov");
-//    public static final UserTo USER_2_To = new UserTo("user2@mail.ru", "Petr",
-//            "Petr", "Petrov");
-
-
+public class MessageControllerIntegrationTest extends AbstractTest {
 
     public static final CreateMessageDto CREATE_MESSAGE_DTO = new CreateMessageDto(
           "Petr", "some text");
@@ -64,14 +39,7 @@ public class MessageControllerIntegrationTest {
              "Petr", "Ivan", "text3answer4", LocalDateTime
             .of(2023, 10, 3, 19, 14, 10));
 
-    @Autowired
-    protected MockMvc mockMvc;
-    @Autowired
-    ObjectMapper mapper;
 
-    protected ResultActions perform(MockHttpServletRequestBuilder builder) throws Exception {
-        return mockMvc.perform(builder);
-    }
 
     @Test
     @DirtiesContext
@@ -136,7 +104,7 @@ public class MessageControllerIntegrationTest {
                 .content(mapper.writeValueAsString(CREATE_MESSAGE_DTO))
                 .characterEncoding(StandardCharsets.UTF_8)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -165,6 +133,4 @@ public class MessageControllerIntegrationTest {
                 .andDo(print())
                 .andExpect(content().json(mapper.writeValueAsString(new ArrayList<>())));
     }
-
-
 }
