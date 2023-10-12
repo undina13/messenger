@@ -23,7 +23,7 @@ public class MessageService {
     private final UserRepository userRepository;
     private final MessageMapper messageMapper;
 
-    @Transactional(readOnly = true)
+    @Transactional
     public FullMessageDto createMessage(CreateMessageDto createMessageDto, String userId) {
         Message message = messageMapper.toMessage(createMessageDto);
         User author = userRepository.findById(userId).orElseThrow(() ->
