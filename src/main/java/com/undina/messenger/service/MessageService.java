@@ -22,19 +22,20 @@ public class MessageService {
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
     private final MessageMapper messageMapper;
+
     @Transactional(readOnly = true)
     public FullMessageDto createMessage(CreateMessageDto createMessageDto, String userId) {
         Message message = messageMapper.toMessage(createMessageDto);
         User author = userRepository.findById(userId).orElseThrow(() ->
                 new ApplicationException(HttpStatus.NOT_FOUND, "Not found"));
-        if(author.getLogin().equals(createMessageDto.getLogin())){
+        if (author.getLogin().equals(createMessageDto.getLogin())) {
             throw new ApplicationException(HttpStatus.BAD_REQUEST, "user can not send message himself");
         }
         message.setAuthor(author);
         User recipient = userRepository.findByLogin(createMessageDto.getLogin()).orElseThrow(() ->
                 new ApplicationException(HttpStatus.NOT_FOUND, "Not found"));
         message.setRecipient(recipient);
-        if(recipient.isClosedMessages()&&!recipient.getFriends().contains(author)){
+        if (recipient.isClosedMessages() && !recipient.getFriends().contains(author)) {
             throw new ApplicationException(HttpStatus.BAD_REQUEST, "Only friends can write this user");
         }
         return messageMapper.toFullMessageDto(messageRepository.save(message));

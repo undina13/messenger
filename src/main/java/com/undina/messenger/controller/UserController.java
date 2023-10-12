@@ -3,7 +3,7 @@ package com.undina.messenger.controller;
 
 import com.undina.messenger.model.User;
 import com.undina.messenger.model.dto.*;
-import com.undina.messenger.security.JWTToken;
+import com.undina.messenger.model.JWTToken;
 import com.undina.messenger.security.SecurityUser;
 import com.undina.messenger.service.UserService;
 import com.undina.messenger.validation.ValidationErrorBuilder;
@@ -191,7 +191,7 @@ public class UserController {
     @GetMapping("/email/{newEmail}/{userId}/{verifyCode}")
     public ResponseEntity<?> changeUserEmail(
             @Parameter(description = "New email")
-            @PathVariable  String newEmail,
+            @PathVariable String newEmail,
             @Parameter(description = "UUID of a User")
             @PathVariable UUID userId,
             @Parameter(description = "Verification code")
@@ -237,7 +237,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Changed current user status",
                     content = @Content
-                    ),
+            ),
             @ApiResponse(responseCode = "400", description = "Invalid password supplied",
                     content = @Content),
             @ApiResponse(responseCode = "401", description = "Wrong credentials",
@@ -272,7 +272,7 @@ public class UserController {
     })
     @DeleteMapping("/delete")
     public ResponseEntity<?> deleteCurrentUser(
-            HttpServletRequest request,  Errors errors) {
+            HttpServletRequest request, Errors errors) {
         log.info("Delete current user");
         if (errors.hasErrors()) {
             log.info("Validation error with request: " + request.getRequestURI());
@@ -289,6 +289,7 @@ public class UserController {
         }
         throw new ApplicationException(HttpStatus.UNAUTHORIZED, "Wrong credentials");
     }
+
     @Operation(summary = "Add user in friends")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Add user in friends",
@@ -342,8 +343,6 @@ public class UserController {
         }
         throw new ApplicationException(HttpStatus.UNAUTHORIZED, "Wrong credentials");
     }
-
-
 }
 
 

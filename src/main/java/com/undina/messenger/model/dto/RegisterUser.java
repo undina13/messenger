@@ -19,7 +19,7 @@ public class RegisterUser {
     private String email;
     @NotBlank(message = "Password can't be blank")
     @NotNull(message = "Password can't be null")
-    @Size(min = 8, max =  30, message = "Password must be between 8 and 30 characters")
+    @Size(min = 8, max = 30, message = "Password must be between 8 and 30 characters")
     private String password;
     @NotBlank(message = "Login can't be blank")
     @NotNull(message = "Login can't be null")

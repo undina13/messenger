@@ -1,4 +1,4 @@
-package com.undina.messenger;
+package com.undina.messenger.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.undina.messenger.model.User;

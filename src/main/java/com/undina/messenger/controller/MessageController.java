@@ -1,6 +1,5 @@
 package com.undina.messenger.controller;
 
-import com.undina.messenger.model.Message;
 import com.undina.messenger.model.User;
 import com.undina.messenger.model.dto.CreateMessageDto;
 import com.undina.messenger.model.dto.FullMessageDto;
@@ -29,8 +28,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
@@ -46,8 +43,8 @@ public class MessageController {
     @Operation(summary = "Create message from Current User")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Message is created",
-                    content = { @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = CreateMessageDto.class)) }),
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CreateMessageDto.class))}),
             @ApiResponse(responseCode = "401", description = "Wrong credentials",
                     content = @Content),
             @ApiResponse(responseCode = "403", description = "Account is blocked, contact support",
@@ -69,7 +66,7 @@ public class MessageController {
             if (principal instanceof SecurityUser) {
                 User user = ((SecurityUser) principal).getUser();
                 return new ResponseEntity<>(
-                       messageService.createMessage(createMessageDto, user.getId()),
+                        messageService.createMessage(createMessageDto, user.getId()),
                         HttpStatus.CREATED
                 );
             }
@@ -80,7 +77,7 @@ public class MessageController {
     @Operation(summary = "Get list of messages for the recipient by User")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
-                    content = { @Content(mediaType = "application/json",
+                    content = {@Content(mediaType = "application/json",
                             array = @ArraySchema(schema = @Schema(implementation = FullMessageDto.class)))}),
             @ApiResponse(responseCode = "401", description = "Wrong credentials",
                     content = @Content),
@@ -104,5 +101,4 @@ public class MessageController {
         }
         throw new ApplicationException(HttpStatus.UNAUTHORIZED, "Wrong credentials");
     }
-
 }

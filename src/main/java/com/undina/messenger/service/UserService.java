@@ -3,13 +3,13 @@ package com.undina.messenger.service;
 
 import com.undina.messenger.emailsender.EmailSender;
 import com.undina.messenger.mapper.UserMapper;
+import com.undina.messenger.model.JWTToken;
 import com.undina.messenger.model.User;
 import com.undina.messenger.model.dto.LoginRequest;
 import com.undina.messenger.model.dto.RegisterUser;
 import com.undina.messenger.model.dto.UpdateUser;
 import com.undina.messenger.model.dto.UserTo;
 import com.undina.messenger.repository.UserRepository;
-import com.undina.messenger.security.JWTToken;
 import com.undina.messenger.security.JWTUtil;
 import com.undina.messenger.validation.exceptions.ApplicationException;
 import lombok.RequiredArgsConstructor;
@@ -109,10 +109,10 @@ public class UserService {
         if (updateUser.getLastName() != null) {
             user.setLastName(updateUser.getLastName());
         }
-        if(updateUser.getIsClosedFriends()!=null){
+        if (updateUser.getIsClosedFriends() != null) {
             user.setClosedFriends(updateUser.getIsClosedFriends());
         }
-        if(updateUser.getIsClosedMessages()!=null){
+        if (updateUser.getIsClosedMessages() != null) {
             user.setClosedMessages(updateUser.getIsClosedMessages());
         }
         userRepository.save(user);
@@ -186,15 +186,15 @@ public class UserService {
         return userMapper.toUserTo(friend);
     }
 
-   @Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public Set<UserTo> getUserFriends(String userId, String friendLogin) {
         User friend = userRepository.findByLogin(friendLogin).orElseThrow(() ->
                 new ApplicationException(HttpStatus.NOT_FOUND, "Not found"));
         if (friend.isClosedFriends()) {
 
-                throw new ApplicationException(HttpStatus.CONFLICT, "user have closed list of friends");
-            }
+            throw new ApplicationException(HttpStatus.CONFLICT, "user have closed list of friends");
+        }
 
-        return friend.getFriends().stream().map(user -> userMapper.toUserTo(user)).collect(Collectors.toSet());
+        return friend.getFriends().stream().map(userMapper::toUserTo).collect(Collectors.toSet());
     }
 }

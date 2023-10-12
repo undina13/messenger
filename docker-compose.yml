@@ -13,4 +13,9 @@ services:
       - "5432:5432"
 
 
-
+  messenger:
+    build: ./messenger
+    container_name: messenger
+    restart: always
+    ports:
+      - "8080:8080"

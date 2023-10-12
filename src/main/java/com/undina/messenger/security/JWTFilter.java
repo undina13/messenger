@@ -1,7 +1,6 @@
 package com.undina.messenger.security;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
-
 import com.undina.messenger.model.User;
 import com.undina.messenger.repository.UserRepository;
 import com.undina.messenger.validation.exceptions.ApplicationException;

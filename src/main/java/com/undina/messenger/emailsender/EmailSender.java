@@ -1,7 +1,6 @@
 package com.undina.messenger.emailsender;
 
 
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +16,7 @@ public class EmailSender {
     private String username;
     private final JavaMailSender javaMailSender;
 
-    public void sendMessage( String subject, String text, String to) {
+    public void sendMessage(String subject, String text, String to) {
         log.info("sendMessage- start: {}, {}, {}", to, subject, text);
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(username);
@@ -28,5 +27,4 @@ public class EmailSender {
         javaMailSender.send(message);
         log.info("sendMessage - end");
     }
-
 }

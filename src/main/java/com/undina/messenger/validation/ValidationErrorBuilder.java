@@ -5,7 +5,6 @@ import org.springframework.validation.Errors;
 public class ValidationErrorBuilder {
     private ValidationErrorBuilder() {
     }
-
     public static ValidationError fromBindingErrors(Errors errors) {
         ValidationError error = new ValidationError(
                 "Validation failure: " + errors.getErrorCount() + " errors.");

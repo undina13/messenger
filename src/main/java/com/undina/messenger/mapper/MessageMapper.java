@@ -2,11 +2,8 @@ package com.undina.messenger.mapper;
 
 
 import com.undina.messenger.model.Message;
-import com.undina.messenger.model.User;
 import com.undina.messenger.model.dto.CreateMessageDto;
 import com.undina.messenger.model.dto.FullMessageDto;
-import com.undina.messenger.model.dto.RegisterUser;
-import com.undina.messenger.model.dto.UserTo;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -18,7 +15,6 @@ public interface MessageMapper {
     @Mapping(target = "authorLogin", source = "author.login")
     @Mapping(target = "recipientLogin", source = "recipient.login")
     FullMessageDto toFullMessageDto(Message message);
-
 }
 
 

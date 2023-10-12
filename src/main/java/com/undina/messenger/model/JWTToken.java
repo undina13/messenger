@@ -1,4 +1,4 @@
-package com.undina.messenger.security;
+package com.undina.messenger.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
